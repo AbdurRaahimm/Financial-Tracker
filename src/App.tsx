@@ -160,25 +160,33 @@ const App: React.FC = () => {
     const totalSavings = transactions.filter(t => t.category === 'Savings').reduce((sum, t) => sum + t.amount, 0);
     const totalExpenses = transactions.filter(t => t.category === 'Expense').reduce((sum, t) => sum + t.amount, 0);
     const totalInvestments = transactions.filter(t => t.category === 'Investment').reduce((sum, t) => sum + t.amount, 0);
-    const currentBalance = totalSavings - totalExpenses - totalInvestments;
-    return { totalSavings,  currentBalance };
+    const costBalance = totalExpenses + totalInvestments;
+    const currentBalance = totalSavings - costBalance;
+    return { totalSavings, costBalance, currentBalance };
   };
 
-  const { totalSavings,  currentBalance } = calculateBalances();
+  const { totalSavings, costBalance, currentBalance } = calculateBalances();
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
         <h1 className="text-3xl font-bold mb-6 text-center bg-gray-800 text-white py-3 rounded">Expense Tracker</h1>
-        <div className="flex flex-wrap -mx-4 mb-6">
-          <div className="w-full md:w-1/2 px-4 mb-4">
+        <div className="flex flex-col md:flex-row flex-wrap -mx-4 mb-6">
+          <div className="flex-1 px-4 mb-4">
             <div className="bg-blue-100 p-4 rounded-lg shadow">
               <h2 className="text-xl font-bold mb-2">Savings Balance</h2>
               <p className="text-3xl font-bold text-blue-600">${totalSavings.toFixed(2)}</p>
             </div>
           </div>
+
+          <div className="flex-1 px-4 mb-4">
+            <div className="bg-blue-100 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-2">Cost Balance</h2>
+              <p className="text-3xl font-bold text-blue-600">${costBalance.toFixed(2)}</p>
+            </div>
+          </div>
          
-          <div className="w-full md:w-1/2 px-4 mb-4">
+          <div className=" fle px-4 mb-4">
             <div className="bg-green-100 p-4 rounded-lg shadow">
               <h2 className="text-xl font-bold mb-2">Current Balance</h2>
               <p className="text-3xl font-bold text-green-600">${currentBalance.toFixed(2)}</p>
@@ -225,7 +233,7 @@ const App: React.FC = () => {
                 <p className="text-2xl font-bold">Total</p>
                 <p className="text-3xl font-bold text-green-500">${totalAmount.toFixed(2)}</p>
               </div>
-              <div className="flex justify-around mt-4">
+              <div className="flex flex-col md:flex-row justify-around mt-4">
                 {data.map((entry, index) => (
                   <div key={entry.name} className="flex items-center">
                     <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[index] }}></div>
