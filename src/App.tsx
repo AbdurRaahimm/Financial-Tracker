@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { DollarSign, Edit2, Trash2 } from 'lucide-react';
+import { DollarSign, Edit2, Trash2, Printer } from 'lucide-react';
+
 
 
 interface Transaction {
@@ -197,8 +198,15 @@ const App: React.FC = () => {
   const filteredTransactions = historyFilter === 'All' ? transactions : transactions.filter(t => t.category === historyFilter);
 
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="fixed top-4 right-4 bg-white p-2 rounded-full shadow-md">
+        <Printer size={24} className="text-gray-600 cursor-pointer print:hidden" onClick={handlePrint} />
+      </div>
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
         <h1 className="text-3xl font-bold mb-6 text-center bg-gray-800 text-white py-3 rounded">Expense Tracker</h1>
 
@@ -273,9 +281,9 @@ const App: React.FC = () => {
                 {/* <p className="text-2xl font-bold">Total</p>
                 <p className="text-3xl font-bold text-green-500">{totalAmount.toFixed(2)}</p> */}
               </div>
-              <div className="flex flex-col md:flex-row justify-around mt-4">
+              <div className="flex flex-col md:flex-row justify-around mt-4 print:flex-row ">
                 {data.map((entry, index) => (
-                  <div key={entry.name} className="flex items-center">
+                  <div key={entry.name} className="flex items-center  ">
                     <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[index] }}></div>
                     <span>{entry.name}</span>
                     <span className="ml-2 font-bold">{totalAmount > 0 ? Math.round((entry.value / totalAmount) * 100) : 0}%</span>
@@ -309,8 +317,8 @@ const App: React.FC = () => {
               </ResponsiveContainer>
             </div>
           </div>
-          <div className="w-full lg:w-1/2 px-4">
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow mb-6">
+          <div className="w-full lg:w-1/2 px-4  ">
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow mb-6 print:hidden">
               <h2 className="text-xl font-bold mb-4">{isEditing ? 'Edit Transaction' : 'New Transaction'}</h2>
               <div className="mb-4">
                 <input
@@ -400,10 +408,10 @@ const App: React.FC = () => {
                       <span className={`font-bold mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : transaction.category === 'Savings' ? 'text-green-500' : 'text-yellow-500'}`}>
                         {transaction.amount.toFixed(2)} {transaction.currency}
                       </span>
-                      <button onClick={() => handleEdit(transaction)} className="text-blue-500 hover:text-blue-700 mr-2">
+                      <button onClick={() => handleEdit(transaction)} className="text-blue-500 hover:text-blue-700 mr-2 print:hidden">
                         <Edit2 size={16} />
                       </button>
-                      <button onClick={() => handleDelete(transaction.id)} className="text-red-500 hover:text-red-700">
+                      <button onClick={() => handleDelete(transaction.id)} className="text-red-500 hover:text-red-700 print:hidden">
                         <Trash2 size={16} />
                       </button>
                     </div>
