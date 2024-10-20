@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { DollarSign, Edit2, Trash2 } from 'lucide-react';
 
+
 interface Transaction {
   id: number;
   description: string;
@@ -33,6 +34,7 @@ const App: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [statisticsPeriod, setStatisticsPeriod] = useState('week');
+  const [historyFilter, setHistoryFilter] = useState('All');  
 
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -51,12 +53,12 @@ const App: React.FC = () => {
           prev.map((t) =>
             t.id === newTransaction.id
               ? {
-                  ...t,
-                  description: newTransaction.description,
-                  amount: parseFloat(newTransaction.amount),
-                  category: newTransaction.category as 'Savings' | 'Expense' | 'Investment',
-                  date: newTransaction.date,
-                }
+                ...t,
+                description: newTransaction.description,
+                amount: parseFloat(newTransaction.amount),
+                category: newTransaction.category as 'Savings' | 'Expense' | 'Investment',
+                date: newTransaction.date,
+              }
               : t
           )
         );
@@ -95,7 +97,7 @@ const App: React.FC = () => {
   const filterTransactions = (period: string) => {
     const now = new Date();
     const startDate = new Date();
-    
+
     switch (period) {
       case 'week':
         startDate.setDate(now.getDate() - 7);
@@ -131,8 +133,8 @@ const App: React.FC = () => {
   const getBarChartData = () => {
     const periods = statisticsPeriod === 'week' ? 7 : statisticsPeriod === 'month' ? 4 : 12;
     const labels = statisticsPeriod === 'week' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] :
-                   statisticsPeriod === 'month' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] :
-                   ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      statisticsPeriod === 'month' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] :
+        ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     return labels.map((label, index) => {
       const filteredTransactions = filterTransactions(statisticsPeriod).filter((t) => {
@@ -167,6 +169,9 @@ const App: React.FC = () => {
 
   const { totalSavings, costBalance, currentBalance } = calculateBalances();
 
+  const filteredTransactions = historyFilter === 'All' ? transactions : transactions.filter(t => t.category === historyFilter);
+
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
@@ -174,22 +179,22 @@ const App: React.FC = () => {
         <div className="flex flex-col md:flex-row flex-wrap -mx-4 mb-6">
           <div className="flex-1 px-4 mb-4">
             <div className="bg-blue-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2">Savings Balance</h2>
-              <p className="text-3xl font-bold text-blue-600">${totalSavings.toFixed(2)}</p>
+              <h2 className="text-xl font-bold mb-2 text-blue-600">Savings Balance</h2>
+              <p className="text-3xl font-bold text-blue-600">{totalSavings.toFixed(2)}</p>
             </div>
           </div>
 
           <div className="flex-1 px-4 mb-4">
-            <div className="bg-blue-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2">Cost Balance</h2>
-              <p className="text-3xl font-bold text-blue-600">${costBalance.toFixed(2)}</p>
+            <div className="bg-red-100 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-2 text-red-600 ">Cost Balance</h2>
+              <p className="text-3xl font-bold text-red-600">{costBalance.toFixed(2)}</p>
             </div>
           </div>
-         
-          <div className=" fle px-4 mb-4">
+
+          <div className=" flex-1 px-4 mb-4">
             <div className="bg-green-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2">Current Balance</h2>
-              <p className="text-3xl font-bold text-green-600">${currentBalance.toFixed(2)}</p>
+              <h2 className="text-xl font-bold mb-2 text-green-600">Current Balance</h2>
+              <p className="text-3xl font-bold text-green-600">{currentBalance.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -231,7 +236,7 @@ const App: React.FC = () => {
               </ResponsiveContainer>
               <div className="text-center mt-4">
                 <p className="text-2xl font-bold">Total</p>
-                <p className="text-3xl font-bold text-green-500">${totalAmount.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-green-500">{totalAmount.toFixed(2)}</p>
               </div>
               <div className="flex flex-col md:flex-row justify-around mt-4">
                 {data.map((entry, index) => (
@@ -322,19 +327,31 @@ const App: React.FC = () => {
               </button>
             </form>
             <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-4">History</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">History</h2>
+                <select
+                  value={historyFilter}
+                  onChange={(e) => setHistoryFilter(e.target.value)}
+                  className="p-2 border rounded"
+                >
+                  <option value="All">All</option>
+                  <option value="Savings">Savings</option>
+                  <option value="Expense">Expense</option>
+                  <option value="Investment">Investment</option>
+                </select>
+              </div>
               <ul className="max-h-96 overflow-y-auto">
-                {transactions.slice().reverse().map((transaction) => (
+                {filteredTransactions.slice().reverse().map((transaction) => (
                   <li key={transaction.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                     <div className="flex items-center">
-                      <DollarSign className={`mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : 'text-green-500'}`} />
+                      <DollarSign className={`mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : transaction.category === 'Savings' ? 'text-green-500' : 'text-yellow-500'}`} />
                       <div>
                         <span>{transaction.description}</span>
                         <span className="text-xs text-gray-500 block">{transaction.date}</span>
                       </div>
                     </div>
                     <div className="flex items-center">
-                      <span className={`font-bold mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : 'text-green-500'}`}>
+                      <span className={`font-bold mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : transaction.category === 'Savings' ? 'text-green-500' : 'text-yellow-500'}`}>
                         ${transaction.amount.toFixed(2)}
                       </span>
                       <button onClick={() => handleEdit(transaction)} className="text-blue-500 hover:text-blue-700 mr-2">
