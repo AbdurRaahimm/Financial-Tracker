@@ -9,17 +9,19 @@ interface Transaction {
   amount: number;
   category: 'Savings' | 'Expense' | 'Investment';
   date: string;
+  currency: string;
 }
 
 const COLORS = ['#0088FE', '#FF8042', '#FFBB28'];
+const CURRENCIES = ['BDT', 'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'HKD', 'NZD', 'SEK', 'NOK', 'TRY', 'RUB', 'INR', 'BRL', 'ZAR', 'MXN', 'SGD', 'THB', 'PHP', 'IDR', 'HUF', 'CZK', 'PLN', 'RON', 'BGN', 'HRK', 'ILS', 'CLP', 'COP', 'PEN', 'PKR', 'QAR', 'SAR', 'AED', 'KRW', 'NGN', 'ZMW', 'XOF', 'XAF', 'GHS', 'UGX', 'TZS', 'RWF', 'MGA', 'CDF', 'GNF', 'XOF', 'XAF', 'GHS', 'UGX', 'TZS', 'RWF', 'MGA', 'CDF', 'GNF', 'XOF', 'XAF', 'GHS', 'UGX', 'TZS', 'RWF', 'MGA', 'CDF', 'GNF'];
 
 const App: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     const savedTransactions = localStorage.getItem('transactions');
     return savedTransactions ? JSON.parse(savedTransactions) : [
-      { id: 1, description: 'Salary', amount: 500, category: 'Savings', date: '2023-03-01' },
-      { id: 2, description: 'Electricity Bill', amount: 200, category: 'Expense', date: '2023-03-05' },
-      { id: 3, description: 'Buy Stocks', amount: 50, category: 'Investment', date: '2023-03-10' },
+      { id: 1, description: 'Salary', amount: 500, category: 'Savings', date: '2023-03-01', currency: 'BDT' },
+      { id: 2, description: 'Electricity Bill', amount: 200, category: 'Expense', date: '2023-03-05', currency: 'BDT' },
+      { id: 3, description: 'Buy Stocks', amount: 50, category: 'Investment', date: '2023-03-10', currency: 'BDT' },
     ];
   });
 
@@ -29,12 +31,13 @@ const App: React.FC = () => {
     amount: '',
     category: 'Savings',
     date: new Date().toISOString().split('T')[0],
+    currency: 'BDT',
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [statisticsPeriod, setStatisticsPeriod] = useState('week');
-  const [historyFilter, setHistoryFilter] = useState('All');  
+  const [historyFilter, setHistoryFilter] = useState('All');
 
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -58,6 +61,7 @@ const App: React.FC = () => {
                 amount: parseFloat(newTransaction.amount),
                 category: newTransaction.category as 'Savings' | 'Expense' | 'Investment',
                 date: newTransaction.date,
+                currency: newTransaction.currency,
               }
               : t
           )
@@ -72,10 +76,11 @@ const App: React.FC = () => {
             amount: parseFloat(newTransaction.amount),
             category: newTransaction.category as 'Savings' | 'Expense' | 'Investment',
             date: newTransaction.date,
+            currency: newTransaction.currency,
           },
         ]);
       }
-      setNewTransaction({ id: 0, description: '', amount: '', category: 'Savings', date: new Date().toISOString().split('T')[0] });
+      setNewTransaction({ id: 0, description: '', amount: '', category: 'Savings', date: new Date().toISOString().split('T')[0], currency: 'BDT' });
     }
   };
 
@@ -86,6 +91,7 @@ const App: React.FC = () => {
       amount: transaction.amount.toString(),
       category: transaction.category,
       date: transaction.date,
+      currency: transaction.currency,
     });
     setIsEditing(true);
   };
@@ -159,15 +165,34 @@ const App: React.FC = () => {
   };
 
   const calculateBalances = () => {
-    const totalSavings = transactions.filter(t => t.category === 'Savings').reduce((sum, t) => sum + t.amount, 0);
-    const totalExpenses = transactions.filter(t => t.category === 'Expense').reduce((sum, t) => sum + t.amount, 0);
-    const totalInvestments = transactions.filter(t => t.category === 'Investment').reduce((sum, t) => sum + t.amount, 0);
-    const costBalance = totalExpenses + totalInvestments;
-    const currentBalance = totalSavings - costBalance;
-    return { totalSavings, costBalance, currentBalance };
+    // Group transactions by currency
+    const balancesByCurrency = CURRENCIES.reduce((acc, currency) => {
+      const currencyTransactions = transactions.filter(t => t.currency === currency);
+
+      if (currencyTransactions.length > 0) {
+        const totalSavings = currencyTransactions
+          .filter(t => t.category === 'Savings')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const totalExpenses = currencyTransactions
+          .filter(t => t.category === 'Expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const totalInvestments = currencyTransactions
+          .filter(t => t.category === 'Investment')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const costBalance = totalExpenses + totalInvestments;
+        const currentBalance = totalSavings - costBalance;
+
+        acc[currency] = { totalSavings, costBalance, currentBalance };
+      }
+      return acc;
+    }, {} as Record<string, { totalSavings: number; costBalance: number; currentBalance: number }>);
+
+    return balancesByCurrency;
   };
 
-  const { totalSavings, costBalance, currentBalance } = calculateBalances();
+  const balancesByCurrency = calculateBalances();
+
+
 
   const filteredTransactions = historyFilter === 'All' ? transactions : transactions.filter(t => t.category === historyFilter);
 
@@ -176,28 +201,38 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
         <h1 className="text-3xl font-bold mb-6 text-center bg-gray-800 text-white py-3 rounded">Expense Tracker</h1>
-        <div className="flex flex-col md:flex-row flex-wrap -mx-4 mb-6">
-          <div className="flex-1 px-4 mb-4">
-            <div className="bg-blue-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2 text-blue-600">Savings Balance</h2>
-              <p className="text-3xl font-bold text-blue-600">{totalSavings.toFixed(2)}</p>
-            </div>
-          </div>
 
-          <div className="flex-1 px-4 mb-4">
-            <div className="bg-red-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2 text-red-600 ">Cost Balance</h2>
-              <p className="text-3xl font-bold text-red-600">{costBalance.toFixed(2)}</p>
-            </div>
-          </div>
+        {
+          Object.entries(balancesByCurrency).map(([currency, balance]) => (
+            <div className="flex flex-col md:flex-row flex-wrap -mx-4 mb-6" key={currency}>
+              <div className="flex-1 px-4 mb-4">
+                <div className="bg-blue-100 p-4 rounded-lg shadow">
+                  <h2 className="text-xl font-bold mb-2 text-blue-600">Savings Balance</h2>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {balance.totalSavings.toFixed(2)} {currency}
+                  </p>
+                </div>
+              </div>
 
-          <div className=" flex-1 px-4 mb-4">
-            <div className="bg-green-100 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-bold mb-2 text-green-600">Current Balance</h2>
-              <p className="text-3xl font-bold text-green-600">{currentBalance.toFixed(2)}</p>
+              <div className="flex-1 px-4 mb-4">
+                <div className="bg-red-100 p-4 rounded-lg shadow">
+                  <h2 className="text-xl font-bold mb-2 text-red-600 ">Cost Balance</h2>
+                  <p className="text-3xl font-bold text-red-600">{balance.costBalance.toFixed(2)} {currency}</p>
+                </div>
+              </div>
+
+              <div className=" flex-1 px-4 mb-4">
+                <div className="bg-green-100 p-4 rounded-lg shadow">
+                  <h2 className="text-xl font-bold mb-2 text-green-600">Current Balance</h2>
+                  <p className="text-3xl font-bold text-green-600">{balance.currentBalance.toFixed(2)} {currency}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ))
+
+
+        }
+
         <div className="flex flex-wrap -mx-4">
           <div className="w-full lg:w-1/2 px-4 mb-6">
             <div className="bg-white p-6 rounded-lg shadow mb-6">
@@ -235,8 +270,8 @@ const App: React.FC = () => {
                 </PieChart>
               </ResponsiveContainer>
               <div className="text-center mt-4">
-                <p className="text-2xl font-bold">Total</p>
-                <p className="text-3xl font-bold text-green-500">{totalAmount.toFixed(2)}</p>
+                {/* <p className="text-2xl font-bold">Total</p>
+                <p className="text-3xl font-bold text-green-500">{totalAmount.toFixed(2)}</p> */}
               </div>
               <div className="flex flex-col md:flex-row justify-around mt-4">
                 {data.map((entry, index) => (
@@ -301,16 +336,27 @@ const App: React.FC = () => {
                   <option value="Investment">Investment</option>
                 </select>
               </div>
-              <div className="mb-4">
+              <div className="mb-4 flex">
                 <input
                   type="number"
                   name="amount"
                   value={newTransaction.amount}
                   onChange={handleInputChange}
                   placeholder="Amount"
-                  className="w-full p-2 border rounded"
+                  className="w-2/3 p-2 border rounded "
                   required
                 />
+                <select
+                  name="currency"
+                  value={newTransaction.currency}
+                  onChange={handleInputChange}
+                  className="w-1/3 p-2 border rounded"
+                  required
+                >
+                  {CURRENCIES.map((currency) => (
+                    <option value={currency}>{currency}</option>
+                  ))}
+                </select>
               </div>
               <div className="mb-4">
                 <input
@@ -352,7 +398,7 @@ const App: React.FC = () => {
                     </div>
                     <div className="flex items-center">
                       <span className={`font-bold mr-2 ${transaction.category === 'Expense' ? 'text-red-500' : transaction.category === 'Savings' ? 'text-green-500' : 'text-yellow-500'}`}>
-                        ${transaction.amount.toFixed(2)}
+                        {transaction.amount.toFixed(2)} {transaction.currency}
                       </span>
                       <button onClick={() => handleEdit(transaction)} className="text-blue-500 hover:text-blue-700 mr-2">
                         <Edit2 size={16} />
