@@ -7,6 +7,7 @@ import Trend from './components/Trend';
 import { Transaction, NewTransaction } from './types/types';
 import Balances from './components/Balances';
 import { CURRENCIES } from './data/currencies';
+import Layout from './components/Layout';
 
 
 
@@ -192,6 +193,7 @@ const App: React.FC = () => {
   };
 
   return (
+    <Layout>  
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="fixed top-4 right-4 bg-white p-2 rounded-full shadow-md print:hidden">
         <Printer size={24} className="text-gray-600 cursor-pointer " onClick={handlePrint} />
@@ -231,6 +233,7 @@ const App: React.FC = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

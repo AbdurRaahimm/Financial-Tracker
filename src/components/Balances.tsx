@@ -12,7 +12,7 @@ interface BalancesProps {
 export default function Balances({ balancesByCurrency }: BalancesProps) {
     return (
         <>
-            <h1 className="text-3xl font-bold mb-6 text-center bg-gray-800 text-white py-3 rounded">Expense Tracker</h1>
+            <h1 className="text-3xl font-bold mb-6 text-center bg-gray-800 text-white py-3 rounded">Financial Tracker</h1>
 
             {
                 Object.entries(balancesByCurrency).map(([currency, balance]) => (
