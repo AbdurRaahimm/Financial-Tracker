@@ -19,7 +19,7 @@ export default function Balances({ balancesByCurrency }: BalancesProps) {
                     <div className="flex flex-col md:flex-row flex-wrap -mx-4 mb-6" key={currency}>
                         <div className="flex-1 px-4 mb-4">
                             <div className="bg-blue-100 p-4 rounded-lg shadow">
-                                <h2 className="text-xl font-bold mb-2 text-blue-600">Savings Balance</h2>
+                                <h2 className="text-xl font-bold mb-2 text-blue-600 capitalize">total Savings Balance</h2>
                                 <p className="text-3xl font-bold text-blue-600">
                                     {balance.totalSavings.toFixed(2)} {currency}
                                 </p>
@@ -28,14 +28,14 @@ export default function Balances({ balancesByCurrency }: BalancesProps) {
 
                         <div className="flex-1 px-4 mb-4">
                             <div className="bg-red-100 p-4 rounded-lg shadow">
-                                <h2 className="text-xl font-bold mb-2 text-red-600 ">Cost Balance</h2>
+                                <h2 className="text-xl font-bold mb-2 text-red-600 capitalize">total Expense Balance</h2>
                                 <p className="text-3xl font-bold text-red-600">{balance.costBalance.toFixed(2)} {currency}</p>
                             </div>
                         </div>
 
                         <div className=" flex-1 px-4 mb-4">
                             <div className="bg-green-100 p-4 rounded-lg shadow">
-                                <h2 className="text-xl font-bold mb-2 text-green-600">Current Balance</h2>
+                                <h2 className="text-xl font-bold mb-2 text-green-600 capitalize">Current Balance</h2>
                                 <p className="text-3xl font-bold text-green-600">{balance.currentBalance.toFixed(2)} {currency}</p>
                             </div>
                         </div>
