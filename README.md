@@ -77,7 +77,7 @@ A simple financial tracker app built with React, TypeScript, and Tailwind CSS.
 
 ## Live Demo
 
-[Live Demo](https://financial-tracker-abdurraahim.netlify.app/)
+[Live Demo](https://financiaal-tracker.netlify.app/)
 
 ## Screenshots
 
