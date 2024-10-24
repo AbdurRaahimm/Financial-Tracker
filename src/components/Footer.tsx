@@ -2,7 +2,7 @@
 
 export default function Footer() {
     return (
-        <footer className="text-center p-4">
+        <footer className="text-center p-4 print:hidden">
             <p>&copy; 2024-{new Date().getFullYear()} Financial Tracker build with 💚 by
                 <a
                     href="https://github.com/AbdurRaahimm"

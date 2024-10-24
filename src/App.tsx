@@ -195,7 +195,7 @@ const App: React.FC = () => {
   return (
     <Layout>  
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="fixed top-4 right-4 bg-white p-2 rounded-full shadow-md print:hidden">
+      <div title='Print Document' className="fixed top-4 right-4 bg-white p-2 rounded-full shadow-md print:hidden">
         <Printer size={24} className="text-gray-600 cursor-pointer " onClick={handlePrint} />
       </div>
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-6xl">
