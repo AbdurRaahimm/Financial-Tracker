@@ -7,15 +7,6 @@ A simple financial tracker app built with React, TypeScript, and Tailwind CSS.
 - Node.js (v14 or later)
 - npm or yarn
 
-## Features
-
-- Add and manage transactions with descriptions, amounts, categories, and dates.
-- View balances for different categories (Savings, Expense, Current).
-- Responsive design for mobile and desktop devices.
-- Local storage for saving transactions.
-- Currency selection for transactions. 
-- Pie chart for visualizing transaction distribution by category. and bar chart for visualizing transaction distribution by date. and Filter transactions by category 
-- Filter transactions by category
 
 ### Installation
 
@@ -59,6 +50,7 @@ A simple financial tracker app built with React, TypeScript, and Tailwind CSS.
 6. Update and Delete transactions from the history section.
 7. Responsive design for mobile and desktop devices.
 8. Print the transactions.
+9. PWA (Progressive Web App) support.
 
 ## Technologies Used
 
@@ -83,3 +75,16 @@ A simple financial tracker app built with React, TypeScript, and Tailwind CSS.
 
 ![Screenshot 1](./public/image.png)
 ![Screenshot 2](./public/image-1.png)
+
+
+## PWA
+
+![Screenshot 3](./public/image-2.png)
+
+
+## Connect on Social Media
+- [Twitter](https://twitter.com/AbdurRahim4G)
+- [Instagram](https://www.instagram.com/abdurrahim4g/)
+- [Facebook](https://www.facebook.com/Rahim72446)
+- [LinkedIn](https://www.linkedin.com/in/abdur-rahim4g/)
+- [YouTube](https://youtube.com/@AbdurRahimm)
